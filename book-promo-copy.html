@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Promotion Copy — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #E0E0DC;
+  --bg-card: #ECEAE2;
+  --bg-light: #F5F3EC;
+  --border: #1A1A1A;
+  --text: #1A1A1A;
+  --muted: #6A6A62;
+  --gold: #B8A050;
+  --gold-hover: #C8B060;
+  --gold-bg: #E8E2CC;
+  --shadow: 4px 4px 0px #1A1A1A;
+  --shadow-lg: 6px 6px 0px #1A1A1A;
+}
+body {
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family: 'Literata', serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 20px 64px;
+}
+.header { text-align: center; margin-bottom: 32px; }
+.wordmark { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.title { font-family:'Outfit',sans-serif; font-size:2rem; font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:1; }
+.subtitle { font-size:.9rem; color:var(--muted); margin-top:8px; font-style:italic; }
+
+.card { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow); padding:28px; max-width:660px; margin:0 auto 20px; }
+
+.field { margin-bottom:18px; }
+label { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:7px; }
+.label-note { font-family:'Literata',serif; font-size:.75rem; color:var(--muted); font-weight:400; font-style:italic; margin-left:5px; text-transform:none; letter-spacing:0; }
+textarea, input[type=text] {
+  width:100%; border:3px solid var(--border); background:var(--bg-light);
+  font-family:'Literata',serif; font-size:.95rem; padding:12px 14px;
+  color:var(--text); outline:none; border-radius:0; display:block;
+}
+textarea { resize:vertical; min-height:82px; }
+textarea:focus, input[type=text]:focus { background:#fff; }
+.field-row { display:flex; gap:12px; }
+.field-row .field { flex:1; min-width:0; }
+
+.launch-btn {
+  display:block; width:100%; margin-top:24px;
+  background:var(--gold); border:3px solid var(--border); box-shadow:var(--shadow);
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:17px;
+  cursor:pointer; transition:all .1s; color:var(--text);
+}
+.launch-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-hover); }
+.launch-btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+
+.loading-box {
+  border:3px solid var(--border); background:var(--gold-bg); padding:30px;
+  text-align:center; box-shadow:var(--shadow); max-width:660px; margin:0 auto 20px; display:none;
+}
+.loading-text { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem; text-transform:uppercase; letter-spacing:.5px; }
+.loading-sub { font-size:.85rem; color:var(--muted); margin-top:6px; font-style:italic; }
+.dot-anim::after { content:''; animation:dots 1.2s steps(4,end) infinite; }
+@keyframes dots { 0%,100%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+.error-box { border:3px solid var(--border); background:#F5E8E8; padding:18px 22px; display:none; max-width:660px; margin:0 auto 16px; }
+.error-text { font-family:'Outfit',sans-serif; font-weight:700; font-size:.88rem; }
+
+.results { max-width:660px; margin:0 auto; display:none; }
+.results-header {
+  display:flex; align-items:center; justify-content:space-between;
+  border:3px solid var(--border); border-bottom:none;
+  background:var(--gold-bg); padding:11px 16px;
+}
+.results-title { font-family:'Outfit',sans-serif; font-weight:900; font-size:.85rem; text-transform:uppercase; letter-spacing:.3px; }
+.results-badge {
+  font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; padding:3px 10px;
+  border:2px solid var(--border); background:var(--bg-light);
+  max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tab-row { display:flex; border:3px solid var(--border); border-bottom:none; border-top:2px solid var(--border); }
+.tab {
+  flex:1; padding:10px 6px; font-family:'Outfit',sans-serif; font-size:.68rem;
+  font-weight:800; text-transform:uppercase; letter-spacing:.5px; cursor:pointer;
+  background:var(--bg); border-right:2px solid var(--border); text-align:center; transition:background .1s;
+}
+.tab:last-child { border-right:none; }
+.tab.active { background:var(--gold); }
+.tab:hover:not(.active) { background:var(--gold-bg); }
+.tab-content { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow-lg); padding:24px; display:none; }
+.tab-content.active { display:block; }
+
+.section-label { font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:8px; }
+.copy-text { font-family:'Literata',serif; font-size:.93rem; line-height:1.68; color:var(--text); white-space:pre-wrap; word-break:break-word; }
+.divider { border:none; border-top:2px solid var(--border); margin:20px 0; }
+.email-num {
+  font-family:'Outfit',sans-serif; font-size:.68rem; font-weight:900; text-transform:uppercase;
+  letter-spacing:1px; background:var(--gold); display:inline-block;
+  padding:3px 10px; border:2px solid var(--border); margin-bottom:10px;
+}
+.copy-btn {
+  margin-top:12px; border:2px solid var(--border); background:transparent;
+  font-family:'Outfit',sans-serif; font-size:.65rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:1px; padding:6px 14px;
+  cursor:pointer; transition:all .1s;
+}
+.copy-btn:hover { background:var(--text); color:var(--bg-light); }
+
+.action-row { display:flex; gap:10px; margin-top:18px; }
+.save-docx-btn {
+  flex:1; background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow);
+  font-family:'Outfit',sans-serif; font-weight:800; font-size:.82rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:13px;
+  cursor:pointer; transition:all .1s; color:var(--text);
+}
+.save-docx-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-bg); }
+.save-docx-btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+.reset-btn {
+  border:3px solid var(--border); background:transparent;
+  font-family:'Outfit',sans-serif; font-size:.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:1px; padding:13px 20px;
+  cursor:pointer; transition:all .1s;
+}
+.reset-btn:hover { background:var(--text); color:var(--bg-light); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Book Promotion Copy</div>
+  <div class="subtitle">Tell us about your book. Get copy that doesn't sound like a press release.</div>
+</div>
+
+<div class="card" id="input-card">
+
+  <div class="field">
+    <label>Your Name</label>
+    <input type="text" id="author-name" placeholder="e.g. Marguerite Flynn">
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Book Title</label>
+      <input type="text" id="book-title" placeholder="e.g. The Vanishing Season">
+    </div>
+    <div class="field">
+      <label>Genre <span class="label-note">optional</span></label>
+      <input type="text" id="book-genre" placeholder="e.g. Literary fiction, climate thriller">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>What's it really about? <span class="label-note">not the plot summary — the emotional premise</span></label>
+    <textarea id="book-hook" placeholder="e.g. A woman returns to her hometown after 20 years to find everyone remembers a version of her that doesn't exist. It's about memory, myth, and the stories we let other people tell about us."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Who's it for? <span class="label-note">describe your ideal reader</span></label>
+    <input type="text" id="book-reader" placeholder="e.g. Readers who loved Pachinko, people who think a lot about place and identity...">
+  </div>
+
+  <div class="field">
+    <label>Where is the book in its life? <span class="label-note">helps set the tone</span></label>
+    <input type="text" id="book-stage" placeholder="e.g. Just launched, out for 6 months, pre-order open, backlist title I want to resurface...">
+  </div>
+
+  <div class="field">
+    <label>Your Voice / Vibe <span class="label-note">optional — helps us sound like you</span></label>
+    <input type="text" id="author-voice" placeholder="e.g. dry wit, earnest and lyrical, quietly devastating, warm and strange...">
+  </div>
+
+  <button class="launch-btn" onclick="launch()">Generate My Copy →</button>
+</div>
+
+<div class="loading-box" id="loading-box">
+  <div class="loading-text">Writing<span class="dot-anim"></span></div>
+  <div class="loading-sub" id="loading-sub">Finding the angle.</div>
+</div>
+
+<div class="error-box" id="error-box">
+  <div class="error-text" id="error-text">Something went sideways. Try again.</div>
+</div>
+
+<div class="results" id="results">
+  <div class="results-header">
+    <span class="results-title">Your Book Copy</span>
+    <span class="results-badge" id="results-badge">—</span>
+  </div>
+  <div class="tab-row">
+    <div class="tab active" onclick="showTab('emails')">3 Emails</div>
+    <div class="tab" onclick="showTab('social')">Social</div>
+    <div class="tab" onclick="showTab('pitch')">Pitch</div>
+  </div>
+
+  <!-- EMAILS -->
+  <div class="tab-content active" id="tab-emails">
+    <div class="email-num">Email 1 — Introduce</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="e1-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="e1-body"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyEmail(1)">Copy Email 1</button>
+    <hr class="divider">
+    <div class="email-num">Email 2 — Go Deeper</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="e2-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="e2-body"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyEmail(2)">Copy Email 2</button>
+    <hr class="divider">
+    <div class="email-num">Email 3 — Ask for the Read</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="e3-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="e3-body"></div>
+    <button class="copy-btn" onclick="copyEmail(3)">Copy Email 3</button>
+  </div>
+
+  <!-- SOCIAL -->
+  <div class="tab-content" id="tab-social">
+    <div class="section-label">Instagram Caption</div>
+    <div class="copy-text" id="social-ig"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyId('social-ig')">Copy Instagram</button>
+    <hr class="divider">
+    <div class="section-label">LinkedIn Post</div>
+    <div class="copy-text" id="social-li"></div>
+    <button class="copy-btn" onclick="copyId('social-li')">Copy LinkedIn</button>
+  </div>
+
+  <!-- PITCH -->
+  <div class="tab-content" id="tab-pitch">
+    <div class="section-label">One-Liner <span style="font-family:'Literata',serif;font-size:.75rem;font-weight:400;font-style:italic;color:var(--muted);text-transform:none;letter-spacing:0;">for verbal intros, bios, anywhere space is tight</span></div>
+    <div class="copy-text" id="pitch-one" style="font-size:1rem;line-height:1.5;margin-bottom:0;"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyId('pitch-one')">Copy One-Liner</button>
+    <hr class="divider">
+    <div class="section-label">Pitch Paragraph <span style="font-family:'Literata',serif;font-size:.75rem;font-weight:400;font-style:italic;color:var(--muted);text-transform:none;letter-spacing:0;">press kit, podcast pitches, media requests</span></div>
+    <div class="copy-text" id="pitch-para"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyId('pitch-para')">Copy Pitch Paragraph</button>
+    <hr class="divider">
+    <div class="section-label">Podcast Guest Bio <span style="font-family:'Literata',serif;font-size:.75rem;font-weight:400;font-style:italic;color:var(--muted);text-transform:none;letter-spacing:0;">third person, ready to paste</span></div>
+    <div class="copy-text" id="pitch-pod"></div>
+    <button class="copy-btn" onclick="copyAll()">Copy All Pitch Copy</button>
+  </div>
+
+  <div class="action-row">
+    <button class="save-docx-btn" onclick="saveDocx()">↓ Save as Word Doc</button>
+    <button class="reset-btn" onclick="reset()">← Start Over</button>
+  </div>
+</div>
+
+<script>
+let generatedData = null;
+const loadingLines = [
+  'Finding the angle.',
+  'Making it not sound like a press release.',
+  'Stealing your voice (affectionately).',
+  'Figuring out what the book is really about.',
+  'Arguing with semicolons.',
+  'Writing the pitch nobody ignores.'
+];
+let loadingInterval;
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const map = { emails:0, social:1, pitch:2 };
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+async function launch() {
+  const bookTitle = document.getElementById('book-title').value.trim();
+  const hook = document.getElementById('book-hook').value.trim();
+  if (!bookTitle || !hook) { alert('Fill in at least the book title and what it\'s really about.'); return; }
+
+  const authorName = document.getElementById('author-name').value.trim();
+  const genre = document.getElementById('book-genre').value.trim();
+  const reader = document.getElementById('book-reader').value.trim();
+  const stage = document.getElementById('book-stage').value.trim();
+  const voice = document.getElementById('author-voice').value.trim();
+
+  hide('results'); hide('error-box');
+  document.getElementById('input-card').style.display = 'none';
+
+  let li = 0;
+  document.getElementById('loading-sub').textContent = loadingLines[0];
+  show('loading-box');
+  loadingInterval = setInterval(() => {
+    li = (li + 1) % loadingLines.length;
+    document.getElementById('loading-sub').textContent = loadingLines[li];
+  }, 2000);
+
+  const system = `You write book promotional copy for authors. Your goal is copy that feels genuinely human — specific, emotionally honest, never generic. Rules without exception: never use the word "actually," never use "join us," never use "don't miss," never use "I'm thrilled to announce," never use "in a world where," never treat algorithms, technology, or social media platforms as though they were people with intentions (no "Instagram rewards consistency," "the algorithm loves this" — keep tech invisible or passive). Write like the author is talking to a reader they respect, not performing for a platform.
+
+Output ONLY valid JSON, no markdown, no preamble:
+{
+  "email1_subject": "Subject for first email. Specific, no clickbait.",
+  "email1_body": "150-200 words. Introduce the book through its emotional premise, not its plot. First person. Starts with the reader's experience, not the author's.",
+  "email2_subject": "Different angle — maybe a question, a scene, something unexpected about the book.",
+  "email2_body": "120-160 words. Go one layer deeper. The thing behind the thing. A passage, a theme, a confession about why this book exists.",
+  "email3_subject": "Direct. Could be warm, could be wry. No fake urgency.",
+  "email3_body": "80-120 words. Ask for the read. Make it feel like an invitation from a person, not a campaign.",
+  "social_instagram": "200-260 words. Storytelling caption that earns its length. Ends with an invitation, not a command. Include [link in bio] placeholder.",
+  "social_linkedin": "160-200 words. About the author's relationship to the work and what it means for readers who think about these things. Professional but human.",
+  "pitch_oneliner": "One sentence. Not a logline. The feeling the book produces plus what it's really about. Under 25 words.",
+  "pitch_paragraph": "3-4 sentences. For press kits and pitch emails. Reads like a person wrote it, not a publicist.",
+  "pitch_podcast_bio": "3-4 sentences. Third person. Who the author is, what drives their work, why this book now."
+}`;
+
+  const user = `Author: ${authorName || 'the author'}
+Book title: ${bookTitle}
+Genre: ${genre || 'not specified'}
+What it's really about: ${hook}
+Ideal reader: ${reader || 'not specified'}
+Where the book is in its life: ${stage || 'not specified'}
+${voice ? `Author voice/vibe: ${voice}` : ''}
+
+Generate book promotional copy.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        system,
+        messages: [{ role: 'user', content: user }]
+      })
+    });
+
+    const data = await res.json();
+    clearInterval(loadingInterval);
+    const p = JSON.parse((data.content?.find(b => b.type==='text')?.text||'').replace(/```json|```/g,'').trim());
+    generatedData = p;
+
+    document.getElementById('results-badge').textContent = bookTitle;
+    document.getElementById('e1-subject').textContent = 'Subject: ' + p.email1_subject;
+    document.getElementById('e1-body').textContent = p.email1_body;
+    document.getElementById('e2-subject').textContent = 'Subject: ' + p.email2_subject;
+    document.getElementById('e2-body').textContent = p.email2_body;
+    document.getElementById('e3-subject').textContent = 'Subject: ' + p.email3_subject;
+    document.getElementById('e3-body').textContent = p.email3_body;
+    document.getElementById('social-ig').textContent = p.social_instagram;
+    document.getElementById('social-li').textContent = p.social_linkedin;
+    document.getElementById('pitch-one').textContent = p.pitch_oneliner;
+    document.getElementById('pitch-para').textContent = p.pitch_paragraph;
+    document.getElementById('pitch-pod').textContent = p.pitch_podcast_bio;
+
+    hide('loading-box'); show('results');
+
+  } catch(e) {
+    clearInterval(loadingInterval);
+    hide('loading-box');
+    document.getElementById('error-text').textContent = 'Something went sideways: ' + e.message;
+    show('error-box');
+    document.getElementById('input-card').style.display = 'block';
+  }
+}
+
+function copyEmail(n) {
+  if (!generatedData) return;
+  navigator.clipboard.writeText('Subject: ' + generatedData['email'+n+'_subject'] + '\n\n' + generatedData['email'+n+'_body']).catch(()=>{});
+}
+function copyId(id) { const el = document.getElementById(id); if (el) navigator.clipboard.writeText(el.textContent).catch(()=>{}); }
+function copyAll() {
+  if (!generatedData) return;
+  const p = generatedData;
+  navigator.clipboard.writeText(p.pitch_oneliner + '\n\n' + p.pitch_paragraph + '\n\nPodcast bio:\n' + p.pitch_podcast_bio).catch(()=>{});
+}
+function reset() {
+  hide('results'); hide('error-box');
+  generatedData = null;
+  document.getElementById('input-card').style.display = 'block';
+}
+
+async function saveDocx() {
+  if (!generatedData) return;
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+  const p = generatedData;
+  const bookTitle = document.getElementById('book-title').value.trim() || 'Book';
+  const h1 = t => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text: t })] });
+  const h2 = t => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text: t })] });
+  const body = t => new Paragraph({ children: [new TextRun({ text: t, font: 'Arial', size: 24 })] });
+  const bold = t => new Paragraph({ children: [new TextRun({ text: t, bold: true, font: 'Arial', size: 24 })] });
+  const blank = () => new Paragraph({ children: [new TextRun('')] });
+  const paras = t => (t||'').split('\n').filter(l=>l.trim()).map(l=>body(l));
+
+  const doc = new Document({
+    styles: {
+      default: { document: { run: { font: 'Arial', size: 24 } } },
+      paragraphStyles: [
+        { id:'Heading1', name:'Heading 1', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{ size:36, bold:true, font:'Arial' }, paragraph:{ spacing:{ before:240, after:160 }, outlineLevel:0 } },
+        { id:'Heading2', name:'Heading 2', basedOn:'Normal', next:'Normal', quickFormat:true,
+          run:{ size:28, bold:true, font:'Arial', color:'8A7A3A' }, paragraph:{ spacing:{ before:400, after:120 }, outlineLevel:1 } },
+      ]
+    },
+    sections: [{
+      properties: { page: { size:{ width:12240, height:15840 }, margin:{ top:1440, right:1440, bottom:1440, left:1440 } } },
+      children: [
+        h1(bookTitle + ' — Promotional Copy'), blank(),
+        h2('Email 1 — Introduce'),
+        bold('Subject: '+p.email1_subject), blank(), ...paras(p.email1_body), blank(),
+        h2('Email 2 — Go Deeper'),
+        bold('Subject: '+p.email2_subject), blank(), ...paras(p.email2_body), blank(),
+        h2('Email 3 — Ask for the Read'),
+        bold('Subject: '+p.email3_subject), blank(), ...paras(p.email3_body), blank(),
+        h2('Instagram Caption'), ...paras(p.social_instagram), blank(),
+        h2('LinkedIn Post'), ...paras(p.social_linkedin), blank(),
+        h2('Pitch Copy'),
+        bold('One-liner:'), ...paras(p.pitch_oneliner), blank(),
+        bold('Pitch paragraph:'), ...paras(p.pitch_paragraph), blank(),
+        bold('Podcast bio:'), ...paras(p.pitch_podcast_bio),
+      ]
+    }]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = bookTitle.replace(/[^a-z0-9]/gi,'-').toLowerCase().slice(0,40)+'-promo-copy.docx';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
