@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop Launcher — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #E0E0DC;
+  --bg-card: #ECEAE2;
+  --border: #1A1A1A;
+  --text: #1A1A1A;
+  --muted: #6A6A62;
+  --gold: #B8A050;
+  --gold-bg: #E8E2CC;
+  --shadow: 4px 4px 0px #1A1A1A;
+  --shadow-lg: 6px 6px 0px #1A1A1A;
+}
+body {
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.006) 3px, rgba(0,0,0,0.006) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.006) 3px, rgba(0,0,0,0.006) 4px);
+  font-family: 'Literata', serif;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 20px 60px;
+}
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.wordmark {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+.card {
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  max-width: 680px;
+  margin: 0 auto 20px;
+}
+label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+}
+textarea {
+  width: 100%;
+  border: 3px solid var(--border);
+  background: #F5F3EC;
+  font-family: 'Literata', serif;
+  font-size: 1rem;
+  padding: 14px;
+  resize: vertical;
+  min-height: 90px;
+  color: var(--text);
+  outline: none;
+  border-radius: 0;
+}
+textarea:focus { background: #fff; }
+.audience-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.aud-btn {
+  flex: 1;
+  min-width: 120px;
+  border: 3px solid var(--border);
+  background: #F5F3EC;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 10px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-align: center;
+}
+.aud-btn:hover { background: var(--gold-bg); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--border); }
+.aud-btn.selected { background: var(--gold); box-shadow: var(--shadow); transform: translate(-1px,-1px); }
+.launch-btn {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  background: var(--gold);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.1s;
+  color: var(--text);
+}
+.launch-btn:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow-lg); background: #C8B060; }
+.launch-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--border); }
+.launch-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: var(--shadow); }
+.loading-box {
+  border: 3px solid var(--border);
+  background: var(--gold-bg);
+  padding: 28px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  max-width: 680px;
+  margin: 0 auto 20px;
+  display: none;
+}
+.loading-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.loading-sub {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 6px;
+  font-style: italic;
+}
+.dot-anim::after {
+  content: '';
+  animation: dots 1.2s steps(4, end) infinite;
+}
+@keyframes dots { 0%,100%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+.results { max-width: 680px; margin: 0 auto; display: none; }
+.tab-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  border: 3px solid var(--border);
+  border-bottom: none;
+}
+.tab {
+  flex: 1;
+  padding: 10px 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  background: var(--bg);
+  border-right: 2px solid var(--border);
+  text-align: center;
+  transition: background 0.1s;
+}
+.tab:last-child { border-right: none; }
+.tab.active { background: var(--gold); }
+.tab:hover:not(.active) { background: var(--gold-bg); }
+.tab-content {
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  display: none;
+}
+.tab-content.active { display: block; }
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.copy-text {
+  font-family: 'Literata', serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.copy-btn {
+  margin-top: 14px;
+  border: 2px solid var(--border);
+  background: transparent;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.copy-btn:hover { background: var(--text); color: #F5F3EC; }
+.divider {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 20px 0;
+}
+.email-num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--gold);
+  display: inline-block;
+  padding: 3px 10px;
+  border: 2px solid var(--border);
+  margin-bottom: 10px;
+}
+.reset-btn {
+  display: block;
+  margin: 20px auto 0;
+  border: 2px solid var(--border);
+  background: transparent;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.reset-btn:hover { background: var(--text); color: #F5F3EC; }
+
+.error-box {
+  border: 3px solid var(--border);
+  background: #F5E8E8;
+  padding: 20px 24px;
+  text-align: center;
+  display: none;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.error-text { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Workshop Launcher</div>
+  <div class="subtitle">From spark to shippable copy in one shot.</div>
+</div>
+
+<div class="card" id="input-card">
+  <label for="idea">What's the workshop idea?</label>
+  <textarea id="idea" placeholder="e.g. A 2-hour workshop on writing a query letter that doesn't sound like everyone else's..."></textarea>
+
+  <div style="margin-top: 20px;">
+    <label>Who's this for?</label>
+    <div class="audience-row">
+      <button class="aud-btn selected" data-val="authors">For Authors</button>
+      <button class="aud-btn" data-val="readers">For Readers</button>
+    </div>
+  </div>
+
+  <button class="launch-btn" id="launch-btn" onclick="launch()">Launch It →</button>
+</div>
+
+<div class="loading-box" id="loading-box">
+  <div class="loading-text">Writing your copy<span class="dot-anim"></span></div>
+  <div class="loading-sub" id="loading-sub">Summoning the good words.</div>
+</div>
+
+<div class="error-box" id="error-box">
+  <div class="error-text" id="error-text">Something went sideways. Try again.</div>
+</div>
+
+<div class="results" id="results">
+  <div class="tab-row">
+    <div class="tab active" onclick="showTab('sales')">Sales Copy</div>
+    <div class="tab" onclick="showTab('payhip')">Payhip Page</div>
+    <div class="tab" onclick="showTab('emails')">3 Emails</div>
+  </div>
+
+  <div class="tab-content active" id="tab-sales">
+    <div class="section-label">Hook</div>
+    <div class="copy-text" id="sales-hook"></div>
+    <hr class="divider">
+    <div class="section-label">Body</div>
+    <div class="copy-text" id="sales-body"></div>
+    <hr class="divider">
+    <div class="section-label">CTA</div>
+    <div class="copy-text" id="sales-cta"></div>
+    <button class="copy-btn" onclick="copySection('sales')">Copy All Sales Copy</button>
+  </div>
+
+  <div class="tab-content" id="tab-payhip">
+    <div class="section-label">Product Title</div>
+    <div class="copy-text" id="payhip-title" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;"></div>
+    <hr class="divider">
+    <div class="section-label">Product Description</div>
+    <div class="copy-text" id="payhip-desc"></div>
+    <hr class="divider">
+    <div class="section-label">What's Included (bullets)</div>
+    <div class="copy-text" id="payhip-includes"></div>
+    <button class="copy-btn" onclick="copySection('payhip')">Copy Payhip Copy</button>
+  </div>
+
+  <div class="tab-content" id="tab-emails">
+    <div class="email-num">Email 1 — Announce</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="email1-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="email1-body"></div>
+    <button class="copy-btn" onclick="copyEmail(1)" style="margin-bottom:24px;">Copy Email 1</button>
+    <hr class="divider">
+    <div class="email-num">Email 2 — Nudge</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="email2-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="email2-body"></div>
+    <button class="copy-btn" onclick="copyEmail(2)" style="margin-bottom:24px;">Copy Email 2</button>
+    <hr class="divider">
+    <div class="email-num">Email 3 — Last Call</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="email3-subject" style="font-weight:600;margin-bottom:8px;"></div>
+    <div class="copy-text" id="email3-body"></div>
+    <button class="copy-btn" onclick="copyEmail(3)">Copy Email 3</button>
+  </div>
+  <button class="reset-btn" onclick="reset()">← Start Over</button>
+</div>
+
+<script>
+let currentAudience = 'authors';
+let generatedData = null;
+
+document.querySelectorAll('.aud-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.aud-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentAudience = btn.dataset.val;
+  });
+});
+
+const loadingLines = [
+  "Summoning the good words.",
+  "Stealing your voice (affectionately).",
+  "Making the emails not sound like an email.",
+  "Arguing with semicolons.",
+  "Pretending it wasn't written by AI.",
+  "Channeling your inner troublemaker."
+];
+let loadingInterval;
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const map = {sales: 0, payhip: 1, emails: 2};
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+function audienceLabel(val) {
+  if (val === 'authors') return 'authors who want to hold workshops, courses, or events for their readers or other writers';
+  return 'readers who want to go deeper into books — book clubs, literary events, reading communities';
+}
+
+async function launch() {
+  const idea = document.getElementById('idea').value.trim();
+  if (!idea) { document.getElementById('idea').focus(); return; }
+
+  hide('results');
+  hide('error-box');
+  document.getElementById('input-card').style.display = 'none';
+  show('loading-box');
+
+  let li = 0;
+  document.getElementById('loading-sub').textContent = loadingLines[0];
+  loadingInterval = setInterval(() => {
+    li = (li + 1) % loadingLines.length;
+    document.getElementById('loading-sub').textContent = loadingLines[li];
+  }, 2200);
+
+  const systemPrompt = `You write workshop launch copy for authors. Your goal is copy that feels genuinely human — specific, warm, never generic. No "unlock your potential," no "don't miss this opportunity," no "I'm thrilled to announce," never use the word "actually," and never treat algorithms, AI, or technology as though they were people doing something. Write like the author is talking to someone they respect.
+
+You generate workshop launch copy. Output ONLY valid JSON, no markdown, no preamble. Schema:
+{
+  "sales_hook": "2-3 punchy sentences. Start with the problem or the moment of recognition.",
+  "sales_body": "4-6 sentences. What they'll walk away with. Specific, not vague.",
+  "sales_cta": "1-2 sentences. Direct ask. No hype.",
+  "payhip_title": "Workshop title. Punchy, specific.",
+  "payhip_desc": "3-4 sentences. Sell the transformation without overselling.",
+  "payhip_includes": "4-6 bullet items as a single string, each on its own line starting with —",
+  "email1_subject": "Announce email subject line",
+  "email1_body": "Announce email body. 150-200 words. Personal, not broadcast-y.",
+  "email2_subject": "Nudge email subject line",
+  "email2_body": "Nudge email. 100-150 words. A different angle, not just 'reminder'.",
+  "email3_subject": "Last call subject line",
+  "email3_body": "Last call email. 80-120 words. Direct. Maybe a little cheeky."
+}`;
+
+  const userPrompt = `Workshop idea: ${idea}
+
+Target audience: ${audienceLabel(currentAudience)}
+
+Generate launch copy for this workshop. Make it sound like Julie — smart, real, a little irreverent. No fluff.`;
+
+  try {
+    const response = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    const data = await response.json();
+    clearInterval(loadingInterval);
+
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    generatedData = parsed;
+
+    document.getElementById('sales-hook').textContent = parsed.sales_hook;
+    document.getElementById('sales-body').textContent = parsed.sales_body;
+    document.getElementById('sales-cta').textContent = parsed.sales_cta;
+    document.getElementById('payhip-title').textContent = parsed.payhip_title;
+    document.getElementById('payhip-desc').textContent = parsed.payhip_desc;
+    document.getElementById('payhip-includes').textContent = parsed.payhip_includes;
+    document.getElementById('email1-subject').textContent = 'Subject: ' + parsed.email1_subject;
+    document.getElementById('email1-body').textContent = parsed.email1_body;
+    document.getElementById('email2-subject').textContent = 'Subject: ' + parsed.email2_subject;
+    document.getElementById('email2-body').textContent = parsed.email2_body;
+    document.getElementById('email3-subject').textContent = 'Subject: ' + parsed.email3_subject;
+    document.getElementById('email3-body').textContent = parsed.email3_body;
+
+    hide('loading-box');
+    show('results');
+
+  } catch(e) {
+    clearInterval(loadingInterval);
+    hide('loading-box');
+    document.getElementById('error-text').textContent = 'Something went sideways: ' + e.message;
+    show('error-box');
+    show('input-card');
+  }
+}
+
+function copySection(type) {
+  if (!generatedData) return;
+  let text = '';
+  if (type === 'sales') {
+    text = generatedData.sales_hook + '\n\n' + generatedData.sales_body + '\n\n' + generatedData.sales_cta;
+  } else if (type === 'payhip') {
+    text = generatedData.payhip_title + '\n\n' + generatedData.payhip_desc + '\n\n' + generatedData.payhip_includes;
+  }
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function copyEmail(n) {
+  if (!generatedData) return;
+  const text = `Subject: ${generatedData['email'+n+'_subject']}\n\n${generatedData['email'+n+'_body']}`;
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function reset() {
+  hide('results');
+  hide('error-box');
+  generatedData = null;
+  document.getElementById('idea').value = '';
+  show('input-card');
+  document.getElementById('input-card').style.display = 'block';
+}
+
+</script>
+</body>
+</html>
