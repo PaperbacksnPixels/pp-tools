@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're in — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#E0E0DC; --bg-card:#ECEAE2; --bg-light:#F5F3EC;
+  --border:#1A1A1A; --text:#1A1A1A; --muted:#6A6A62;
+  --gold:#B8A050; --gold-hover:#C8B060; --gold-bg:#E8E2CC;
+  --shadow:4px 4px 0px #1A1A1A; --shadow-lg:6px 6px 0px #1A1A1A;
+}
+body {
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family:'Literata',serif; color:var(--text);
+  min-height:100vh; display:flex; flex-direction:column;
+}
+.nav {
+  border-bottom:3px solid var(--border); background:var(--gold);
+  padding:14px 28px; display:flex; justify-content:space-between; align-items:center;
+}
+.nav-logo { font-family:'Outfit',sans-serif; font-weight:900; font-size:1rem; text-transform:uppercase; letter-spacing:-.3px; text-decoration:none; color:var(--text); }
+
+.main { flex:1; display:flex; align-items:center; justify-content:center; padding:48px 20px; }
+.card {
+  background:var(--bg-card); border:3px solid var(--border);
+  box-shadow:var(--shadow-lg); padding:48px 40px;
+  max-width:560px; width:100%; text-align:center;
+}
+.check {
+  font-family:'Space Mono',monospace; font-size:2rem; font-weight:700;
+  color:var(--gold); margin-bottom:20px; display:block;
+}
+h1 {
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:2rem;
+  text-transform:uppercase; letter-spacing:-1px; line-height:1; margin-bottom:16px;
+}
+.sub {
+  font-size:1rem; color:var(--muted); line-height:1.65; margin-bottom:28px;
+}
+.email-note {
+  background:var(--gold-bg); border:3px solid var(--border);
+  padding:16px 20px; margin-bottom:28px;
+  font-family:'Literata',serif; font-size:.9rem; line-height:1.6; color:var(--text);
+}
+.email-note strong { font-style:normal; }
+.divider { border:none; border-top:2px solid var(--border); margin:24px 0; }
+.tools-list {
+  text-align:left; margin-bottom:28px;
+}
+.tool-line {
+  display:flex; align-items:baseline; gap:10px;
+  padding:9px 0; border-bottom:1px solid #D8D6CE;
+  font-family:'Literata',serif; font-size:.92rem;
+}
+.tool-line:last-child { border-bottom:none; }
+.tool-check {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  font-weight:700; color:var(--gold); flex-shrink:0;
+}
+.btn-primary {
+  display:block; background:var(--gold); color:var(--text);
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:1rem;
+  padding:16px 36px; border:3px solid var(--border); cursor:pointer;
+  transition:all .1s; text-transform:uppercase; letter-spacing:.5px;
+  text-decoration:none; box-shadow:var(--shadow); width:100%; text-align:center;
+}
+.btn-primary:hover { background:var(--gold-hover); transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); }
+.note {
+  font-family:'Literata',serif; font-size:.82rem; color:var(--muted);
+  font-style:italic; margin-top:14px; line-height:1.55;
+}
+.footer {
+  border-top:3px solid var(--border); background:var(--gold);
+  padding:16px 28px; text-align:center;
+  font-family:'Outfit',sans-serif; font-weight:700; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:1.5px;
+}
+.footer a { color:var(--text); text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">Paperbacks & Pixels</a>
+</nav>
+
+<main class="main">
+  <div class="card">
+    <span class="check">[+]</span>
+    <h1>You're in.</h1>
+    <p class="sub">Your access link is on its way. Check your inbox — it should arrive within a minute or two.</p>
+
+    <div class="email-note">
+      <strong>Your access link is personal to you.</strong> It's how you get into the tools — no password, no login. Bookmark it once it arrives and you won't need to find this email again.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="tools-list">
+      <div class="tool-line"><span class="tool-check">[+]</span> Find Your Voice</div>
+      <div class="tool-line"><span class="tool-check">[+]</span> Author Launch Pad</div>
+      <div class="tool-line"><span class="tool-check">[+]</span> Book Promotion Copy</div>
+      <div class="tool-line"><span class="tool-check">[+]</span> Workshop Launcher</div>
+      <div class="tool-line"><span class="tool-check">[+]</span> Find Your Comp Authors</div>
+      <div class="tool-line"><span class="tool-check">[+]</span> Substack Strategy Builder</div>
+    </div>
+
+    <a href="https://author-helpers.netlify.app/voice-finder.html" class="btn-primary">Start with Find Your Voice →</a>
+    <p class="note">No email yet? Check your spam folder. Still nothing after five minutes — email <a href="mailto:Julie@PaperbacksandPixels.com?subject=Access link not received" style="color:var(--text);">Julie@PaperbacksandPixels.com</a> and I'll sort it.</p>
+  </div>
+</main>
+
+<footer class="footer">
+  Made with mischief by <a href="https://paperbacksandpixels.com" target="_blank">Paperbacks & Pixels</a>
+</footer>
+
+</body>
+</html>
