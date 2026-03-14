@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paperbacks & Pixels — Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#E0E0DC; --bg-card:#ECEAE2; --border:#1A1A1A; --text:#1A1A1A;
+  --muted:#6A6A62; --gold:#B8A050; --gold-bg:#E8E2CC;
+  --shadow:4px 4px 0px #1A1A1A; --shadow-lg:6px 6px 0px #1A1A1A;
+}
+body {
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family:'Literata',serif; color:var(--text); min-height:100vh;
+  padding:48px 20px 64px;
+}
+.header { text-align:center; margin-bottom:48px; }
+.wordmark { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.title { font-family:'Outfit',sans-serif; font-size:2.2rem; font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:1; }
+.subtitle { font-size:.95rem; color:var(--muted); margin-top:10px; font-style:italic; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; max-width:900px; margin:0 auto; }
+.tool-card {
+  display:block; text-decoration:none;
+  background:var(--bg-card); border:3px solid var(--border);
+  box-shadow:var(--shadow); padding:28px 24px;
+  transition:all .1s; color:var(--text);
+}
+.tool-card:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-bg); }
+.tool-card:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+.tool-name { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.1rem; text-transform:uppercase; letter-spacing:-.3px; margin-bottom:8px; }
+.tool-desc { font-size:.9rem; color:var(--muted); line-height:1.55; font-style:italic; }
+.tool-arrow { font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700; margin-top:16px; display:block; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Author Tools</div>
+  <div class="subtitle">Copy generators for authors who'd rather write than market.</div>
+</div>
+<div class="grid">
+  <a href="/author-launch-pad.html" class="tool-card">
+    <div class="tool-name">Author Launch Pad</div>
+    <div class="tool-desc">Promote a book-related event — launch, reading, workshop, panel. Get a Lu.ma page, three emails, and social copy.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+  <a href="/book-promo-copy.html" class="tool-card">
+    <div class="tool-name">Book Promotion Copy</div>
+    <div class="tool-desc">General book promotion not tied to an event. Three emails, Instagram and LinkedIn captions, and pitch copy for press and podcasts.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+  <a href="/workshop-launcher.html" class="tool-card">
+    <div class="tool-name">Workshop Launcher</div>
+    <div class="tool-desc">For Paperbacks & Pixels workshops — sales copy, Payhip product page, and a three-email sequence.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+  <a href="/voice-finder.html" class="tool-card">
+    <div class="tool-name">Find Your Voice</div>
+    <div class="tool-desc">Seven questions and an optional writing sample. Get a voice profile you can paste into any tool, plus writing prompts to keep you on-brand.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+  <a href="/comp-finder.html" class="tool-card">
+    <div class="tool-name">Find Your Comp Authors</div>
+    <div class="tool-desc">Describe your book and your influences. Get a shortlist of comps with reasons you can defend, two pitch lines, and a clear list of what not to use.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+  <a href="/substack-strategy.html" class="tool-card">
+    <div class="tool-name">Substack Strategy Builder</div>
+    <div class="tool-desc">Tell us about your writing, your goal, and how much time you have. Get content pillars, a realistic cadence, growth strategy, monetization advice, and a welcome email.</div>
+    <span class="tool-arrow">Open →</span>
+  </a>
+</div>
+
+<div style="max-width:900px;margin:32px auto 0;padding:0 20px;text-align:center;">
+  <a href="/feedback.html" style="display:inline-block;font-family:'Outfit',sans-serif;font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;padding:12px 28px;border:3px solid #1A1A1A;background:#ECEAE2;text-decoration:none;color:#1A1A1A;box-shadow:4px 4px 0px #1A1A1A;transition:all .1s;" onmouseover="this.style.transform='translate(-2px,-2px)';this.style.boxShadow='6px 6px 0px #1A1A1A'" onmouseout="this.style.transform='';this.style.boxShadow='4px 4px 0px #1A1A1A'">Share Feedback →</a>
+  <p style="font-family:'Literata',serif;font-size:.82rem;color:#6A6A62;font-style:italic;margin-top:10px;">Tried the tools? Tell me what's wrong with them.</p>
+</div>
+</body>
+</html>

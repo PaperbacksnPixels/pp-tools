@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Your Feedback — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#E0E0DC; --bg-card:#ECEAE2; --bg-light:#F5F3EC;
+  --border:#1A1A1A; --text:#1A1A1A; --muted:#6A6A62;
+  --gold:#B8A050; --gold-hover:#C8B060; --gold-bg:#E8E2CC;
+  --shadow:4px 4px 0px #1A1A1A; --shadow-lg:6px 6px 0px #1A1A1A;
+}
+body {
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family:'Literata',serif; color:var(--text); min-height:100vh; padding:32px 20px 64px;
+}
+.header { text-align:center; margin-bottom:32px; }
+.wordmark { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.title { font-family:'Outfit',sans-serif; font-size:2rem; font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:1; }
+.subtitle { font-size:.9rem; color:var(--muted); margin-top:8px; font-style:italic; }
+
+.card { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow); padding:28px; max-width:660px; margin:0 auto 20px; }
+
+.field { margin-bottom:20px; }
+label { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px; }
+.label-note { font-family:'Literata',serif; font-size:.75rem; color:var(--muted); font-weight:400; font-style:italic; margin-left:5px; text-transform:none; letter-spacing:0; }
+input[type=text], input[type=email], textarea {
+  width:100%; border:3px solid var(--border); background:var(--bg-light);
+  font-family:'Literata',serif; font-size:.95rem; padding:12px 14px;
+  color:var(--text); outline:none; border-radius:0; display:block;
+}
+textarea { resize:vertical; min-height:120px; }
+input[type=text]:focus, input[type=email]:focus, textarea:focus { background:#fff; }
+
+/* ROLE BUTTONS */
+.seg-row { display:flex; gap:0; flex-wrap:wrap; margin-top:2px; }
+.seg-btn {
+  border:3px solid var(--border); padding:10px 18px; cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.5px; background:var(--bg-light);
+  margin-right:-3px; margin-bottom:-3px; transition:background .1s; color:var(--text);
+}
+.seg-btn:hover { background:var(--gold-bg); }
+.seg-btn.selected { background:var(--gold); }
+
+/* TOOL CHECKBOXES */
+.tools-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:2px; }
+.tool-check {
+  border:3px solid var(--border); padding:10px 14px; cursor:pointer;
+  font-family:'Literata',serif; font-size:.88rem;
+  background:var(--bg-light); margin-right:-3px; margin-bottom:-3px;
+  transition:background .1s; color:var(--text); display:flex; align-items:center; gap:8px;
+}
+.tool-check:hover { background:var(--gold-bg); }
+.tool-check.selected { background:var(--gold); }
+.tool-check .check-icon {
+  font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700;
+  width:16px; flex-shrink:0;
+}
+
+/* SUBMIT */
+.submit-btn {
+  display:block; width:100%; margin-top:24px;
+  background:var(--gold); border:3px solid var(--border); box-shadow:var(--shadow);
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:17px;
+  cursor:pointer; transition:all .1s; color:var(--text);
+}
+.submit-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-hover); }
+.submit-btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+.submit-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:var(--shadow); }
+
+/* SUCCESS */
+.success-box {
+  border:3px solid var(--border); background:var(--gold-bg); padding:36px 28px;
+  text-align:center; box-shadow:var(--shadow); max-width:660px; margin:0 auto; display:none;
+}
+.success-title { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.3rem; text-transform:uppercase; letter-spacing:-.5px; margin-bottom:10px; }
+.success-sub { font-size:.92rem; color:var(--muted); font-style:italic; margin-bottom:20px; line-height:1.6; }
+.back-link {
+  display:inline-block; font-family:'Outfit',sans-serif; font-weight:800; font-size:.78rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:10px 22px;
+  border:3px solid var(--border); background:var(--bg-card); text-decoration:none;
+  color:var(--text); box-shadow:var(--shadow); transition:all .1s;
+}
+.back-link:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); }
+
+.error-box { border:3px solid var(--border); background:#F5E8E8; padding:18px 22px; display:none; max-width:660px; margin:0 auto 16px; }
+.error-text { font-family:'Outfit',sans-serif; font-weight:700; font-size:.88rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Share Your Feedback</div>
+  <div class="subtitle">You tried the tools. Tell me what's wrong with them.</div>
+</div>
+
+<div class="card" id="form-card">
+
+  <div class="field">
+    <label>Your Name</label>
+    <input type="text" id="f-name" placeholder="e.g. Marguerite Flynn">
+  </div>
+
+  <div class="field">
+    <label>Email</label>
+    <input type="email" id="f-email" placeholder="e.g. marguerite@example.com">
+  </div>
+
+  <div class="field">
+    <label>Your Role</label>
+    <div class="seg-row" id="seg-role">
+      <button class="seg-btn" data-val="Author">Author</button>
+      <button class="seg-btn" data-val="Publishing Professional">Publishing Professional</button>
+      <button class="seg-btn" data-val="Other">Other</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Which tools did you try? <span class="label-note">select all that apply</span></label>
+    <div class="tools-grid" id="tools-grid">
+      <div class="tool-check" data-val="Find Your Voice" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Find Your Voice
+      </div>
+      <div class="tool-check" data-val="Author Launch Pad" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Author Launch Pad
+      </div>
+      <div class="tool-check" data-val="Book Promotion Copy" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Book Promotion Copy
+      </div>
+      <div class="tool-check" data-val="Workshop Launcher" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Workshop Launcher
+      </div>
+      <div class="tool-check" data-val="Find Your Comp Authors" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Find Your Comp Authors
+      </div>
+      <div class="tool-check" data-val="Substack Strategy Builder" onclick="toggleTool(this)">
+        <span class="check-icon">[ ]</span>Substack Strategy Builder
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Comments <span class="label-note">what worked, what didn't, what's missing</span></label>
+    <textarea id="f-comments" placeholder="Be as specific as you like. 'The voice profile nailed it' is useful. 'The emails felt generic' is more useful. 'The emails felt generic because they didn't pick up on my dry humor even though I mentioned it' is the most useful."></textarea>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitForm()">Send Feedback →</button>
+</div>
+
+<div class="error-box" id="error-box">
+  <div class="error-text" id="error-text">Something went sideways. Try again.</div>
+</div>
+
+<div class="success-box" id="success-box">
+  <div class="success-title">Thank you.</div>
+  <div class="success-sub">Your feedback is in. I read every single one and it goes directly into the next round of improvements.</div>
+  <a href="/" class="back-link">← Back to the tools</a>
+</div>
+
+<script>
+let selectedRole = '';
+
+document.querySelectorAll('#seg-role .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#seg-role .seg-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedRole = btn.dataset.val;
+  });
+});
+
+function toggleTool(el) {
+  el.classList.toggle('selected');
+  el.querySelector('.check-icon').textContent = el.classList.contains('selected') ? '[x]' : '[ ]';
+}
+
+function getSelectedTools() {
+  return Array.from(document.querySelectorAll('.tool-check.selected')).map(el => el.dataset.val);
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+async function submitForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const comments = document.getElementById('f-comments').value.trim();
+  const tools = getSelectedTools();
+
+  if (!name || !email || !comments) {
+    document.getElementById('error-text').textContent = 'Please fill in your name, email, and comments.';
+    show('error-box');
+    return;
+  }
+
+  hide('error-box');
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('/.netlify/functions/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        role: selectedRole,
+        tools,
+        comments
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+    document.getElementById('form-card').style.display = 'none';
+    show('success-box');
+
+  } catch(err) {
+    document.getElementById('error-text').textContent = 'Something went sideways: ' + err.message;
+    show('error-box');
+    btn.disabled = false;
+    btn.textContent = 'Send Feedback →';
+  }
+}
+</script>
+</body>
+</html>
