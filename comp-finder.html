@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Comp Authors — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#E0E0DC; --bg-card:#ECEAE2; --bg-light:#F5F3EC;
+  --border:#1A1A1A; --text:#1A1A1A; --muted:#6A6A62;
+  --gold:#B8A050; --gold-hover:#C8B060; --gold-bg:#E8E2CC;
+  --shadow:4px 4px 0px #1A1A1A; --shadow-lg:6px 6px 0px #1A1A1A;
+}
+body {
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family:'Literata',serif; color:var(--text); min-height:100vh; padding:32px 20px 64px;
+}
+.header { text-align:center; margin-bottom:32px; }
+.wordmark { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.title { font-family:'Outfit',sans-serif; font-size:2rem; font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:1; }
+.subtitle { font-size:.9rem; color:var(--muted); margin-top:8px; font-style:italic; }
+
+.card { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow); padding:28px; max-width:660px; margin:0 auto 20px; }
+.field { margin-bottom:20px; }
+label { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:7px; }
+.label-note { font-family:'Literata',serif; font-size:.75rem; color:var(--muted); font-weight:400; font-style:italic; margin-left:5px; text-transform:none; letter-spacing:0; }
+textarea, input[type=text] {
+  width:100%; border:3px solid var(--border); background:var(--bg-light);
+  font-family:'Literata',serif; font-size:.95rem; padding:12px 14px;
+  color:var(--text); outline:none; border-radius:0; display:block;
+}
+textarea { resize:vertical; min-height:82px; }
+textarea:focus, input[type=text]:focus { background:#fff; }
+.field-row { display:flex; gap:12px; }
+.field-row .field { flex:1; min-width:0; }
+
+.launch-btn {
+  display:block; width:100%; margin-top:24px;
+  background:var(--gold); border:3px solid var(--border); box-shadow:var(--shadow);
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:17px;
+  cursor:pointer; transition:all .1s; color:var(--text);
+}
+.launch-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-hover); }
+.launch-btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+
+.loading-box {
+  border:3px solid var(--border); background:var(--gold-bg); padding:30px;
+  text-align:center; box-shadow:var(--shadow); max-width:660px; margin:0 auto 20px; display:none;
+}
+.loading-text { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem; text-transform:uppercase; letter-spacing:.5px; }
+.loading-sub { font-size:.85rem; color:var(--muted); margin-top:6px; font-style:italic; }
+.dot-anim::after { content:''; animation:dots 1.2s steps(4,end) infinite; }
+@keyframes dots { 0%,100%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+.error-box { border:3px solid var(--border); background:#F5E8E8; padding:18px 22px; display:none; max-width:660px; margin:0 auto 16px; }
+.error-text { font-family:'Outfit',sans-serif; font-weight:700; font-size:.88rem; }
+
+.results { max-width:660px; margin:0 auto; display:none; }
+.results-header {
+  display:flex; align-items:center; justify-content:space-between;
+  border:3px solid var(--border); border-bottom:none; background:var(--gold-bg); padding:11px 16px;
+}
+.results-title { font-family:'Outfit',sans-serif; font-weight:900; font-size:.85rem; text-transform:uppercase; letter-spacing:.3px; }
+.results-badge { font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:3px 10px; border:2px solid var(--border); background:var(--bg-light); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.tab-row { display:flex; border:3px solid var(--border); border-bottom:none; border-top:2px solid var(--border); }
+.tab { flex:1; padding:10px 6px; font-family:'Outfit',sans-serif; font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; background:var(--bg); border-right:2px solid var(--border); text-align:center; transition:background .1s; }
+.tab:last-child { border-right:none; }
+.tab.active { background:var(--gold); }
+.tab:hover:not(.active) { background:var(--gold-bg); }
+.tab-content { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow-lg); padding:24px; display:none; }
+.tab-content.active { display:block; }
+
+.section-label { font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
+.copy-text { font-family:'Literata',serif; font-size:.93rem; line-height:1.68; color:var(--text); white-space:pre-wrap; word-break:break-word; }
+.divider { border:none; border-top:2px solid var(--border); margin:20px 0; }
+
+.comp-card {
+  border:3px solid var(--border); padding:16px 18px; margin-bottom:12px;
+  background:var(--bg-light); box-shadow:2px 2px 0 var(--border);
+}
+.comp-name { font-family:'Outfit',sans-serif; font-weight:900; font-size:1rem; margin-bottom:4px; }
+.comp-reason { font-family:'Literata',serif; font-size:.88rem; color:var(--muted); line-height:1.55; margin-bottom:8px; }
+.comp-why { font-family:'Literata',serif; font-size:.88rem; color:var(--text); line-height:1.6; }
+
+.avoid-card {
+  border:3px solid var(--border); border-left:6px solid var(--border);
+  padding:14px 16px; margin-bottom:12px; background:var(--bg-light);
+}
+.avoid-name { font-family:'Outfit',sans-serif; font-weight:900; font-size:.9rem; margin-bottom:4px; }
+.avoid-reason { font-family:'Literata',serif; font-size:.88rem; color:var(--muted); line-height:1.55; }
+
+.pitch-box {
+  background:var(--gold-bg); border:3px solid var(--border);
+  padding:18px 20px; margin-bottom:16px; font-family:'Literata',serif;
+  font-size:1.05rem; line-height:1.6; font-style:italic;
+}
+
+.copy-btn { margin-top:12px; border:2px solid var(--border); background:transparent; font-family:'Outfit',sans-serif; font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:6px 14px; cursor:pointer; transition:all .1s; }
+.copy-btn:hover { background:var(--text); color:var(--bg-light); }
+.reset-btn { display:block; margin:18px auto 0; border:2px solid var(--border); background:transparent; font-family:'Outfit',sans-serif; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; padding:8px 20px; cursor:pointer; transition:all .1s; }
+.reset-btn:hover { background:var(--text); color:var(--bg-light); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Find Your Comp Authors</div>
+  <div class="subtitle">Describe your book and your influences. Get comps you can actually defend.</div>
+</div>
+
+<div class="card" id="input-card">
+
+  <div class="field-row">
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="author-name" placeholder="e.g. Marguerite Flynn">
+    </div>
+    <div class="field">
+      <label>Book Title</label>
+      <input type="text" id="book-title" placeholder="e.g. The Vanishing Season">
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Genre</label>
+      <input type="text" id="book-genre" placeholder="e.g. Literary fiction, upmarket thriller">
+    </div>
+    <div class="field">
+      <label>Are you querying or published?</label>
+      <input type="text" id="book-stage" placeholder="e.g. Querying agents, self-publishing, already published">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>What's it really about? <span class="label-note">the emotional premise, not the plot</span></label>
+    <textarea id="book-hook" placeholder="e.g. A woman returns to her hometown after 20 years to find everyone remembers a version of her that doesn't exist. It's about memory, myth, and the stories we let other people tell about us."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Books or authors that influenced you <span class="label-note">or that you love — even if they feel too big</span></label>
+    <textarea id="book-influences" style="min-height:60px;" placeholder="e.g. Maggie O'Farrell, Ocean Vuong, Pachinko by Min Jin Lee, anything by Toni Morrison..."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What makes your book different from those? <span class="label-note">optional but useful</span></label>
+    <input type="text" id="book-diff" placeholder="e.g. More plot-driven, set in a specific community rarely represented, darker ending...">
+  </div>
+
+  <div class="field">
+    <label>Your ideal reader <span class="label-note">optional</span></label>
+    <input type="text" id="book-reader" placeholder="e.g. Readers who loved Hamnet, book club readers who want something to argue about...">
+  </div>
+
+  <button class="launch-btn" onclick="launch()">Find My Comps →</button>
+</div>
+
+<div class="loading-box" id="loading-box">
+  <div class="loading-text">Reading the room<span class="dot-anim"></span></div>
+  <div class="loading-sub" id="loading-sub">Thinking about who this sits next to.</div>
+</div>
+
+<div class="error-box" id="error-box">
+  <div class="error-text" id="error-text">Something went sideways. Try again.</div>
+</div>
+
+<div class="results" id="results">
+  <div class="results-header">
+    <span class="results-title">Your Comp Authors</span>
+    <span class="results-badge" id="results-badge">—</span>
+  </div>
+  <div class="tab-row">
+    <div class="tab active" onclick="showTab('comps')">Comps</div>
+    <div class="tab" onclick="showTab('pitch')">Pitch Line</div>
+    <div class="tab" onclick="showTab('avoid')">What to Avoid</div>
+  </div>
+
+  <!-- COMPS TAB -->
+  <div class="tab-content active" id="tab-comps">
+    <div class="section-label" style="margin-bottom:14px;">Your shortlist — with reasons you can use in a query or conversation</div>
+    <div id="comps-list"></div>
+    <button class="copy-btn" onclick="copyComps()">Copy all comps</button>
+  </div>
+
+  <!-- PITCH TAB -->
+  <div class="tab-content" id="tab-pitch">
+    <div class="section-label">Pitch line <span style="font-family:'Literata',serif;font-size:.75rem;font-weight:400;font-style:italic;color:var(--muted);text-transform:none;letter-spacing:0;">for query letters, bios, and social</span></div>
+    <div class="pitch-box" id="pitch-line"></div>
+    <button class="copy-btn" style="margin-bottom:22px;" onclick="copyId('pitch-line')">Copy pitch line</button>
+    <hr class="divider">
+    <div class="section-label">Alternative pitch line <span style="font-family:'Literata',serif;font-size:.75rem;font-weight:400;font-style:italic;color:var(--muted);text-transform:none;letter-spacing:0;">different angle</span></div>
+    <div class="pitch-box" id="pitch-alt"></div>
+    <button class="copy-btn" onclick="copyId('pitch-alt')">Copy alternative</button>
+  </div>
+
+  <!-- AVOID TAB -->
+  <div class="tab-content" id="tab-avoid">
+    <div class="section-label" style="margin-bottom:6px;">Don't use these as comps</div>
+    <p style="font-family:'Literata',serif;font-size:.85rem;color:var(--muted);font-style:italic;margin-bottom:16px;line-height:1.55;">Includes blockbusters, books over five years old, and authors at a very different career stage — all common mistakes that signal inexperience to agents and publishers.</p>
+    <div id="avoid-list"></div>
+  </div>
+
+  <button class="reset-btn" onclick="reset()">← Start Over</button>
+</div>
+
+<script>
+let generatedData = null;
+const loadingLines = [
+  'Thinking about who this sits next to.',
+  'Checking publication dates.',
+  'Ruling out the obvious ones.',
+  'Looking for the right level of known.',
+  'Finding the pattern in your influences.',
+  'Thinking about what agents actually want to see.'
+];
+let loadingInterval;
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const map = { comps:0, pitch:1, avoid:2 };
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+async function launch() {
+  const bookTitle = document.getElementById('book-title').value.trim();
+  const hook = document.getElementById('book-hook').value.trim();
+  if (!bookTitle || !hook) { alert('Fill in at least the book title and what it\'s really about.'); return; }
+
+  const authorName = document.getElementById('author-name').value.trim();
+  const genre = document.getElementById('book-genre').value.trim();
+  const stage = document.getElementById('book-stage').value.trim();
+  const influences = document.getElementById('book-influences').value.trim();
+  const diff = document.getElementById('book-diff').value.trim();
+  const reader = document.getElementById('book-reader').value.trim();
+
+  hide('results'); hide('error-box');
+  document.getElementById('input-card').style.display = 'none';
+
+  let li = 0;
+  document.getElementById('loading-sub').textContent = loadingLines[0];
+  show('loading-box');
+  loadingInterval = setInterval(() => {
+    li = (li + 1) % loadingLines.length;
+    document.getElementById('loading-sub').textContent = loadingLines[li];
+  }, 2000);
+
+  const system = `You are a literary agent and publishing consultant who helps authors find appropriate comp authors for their books. You know the publishing market well, understand what agents look for, and you give honest, specific advice — not flattery.
+
+Rules for good comps:
+- Published within the last 5 years (ideally 2-4 years)
+- Successful but not so huge they're meaningless (no Stephen King, no Harry Potter, no Gone Girl unless very specifically justified)
+- Similar in tone, theme, or readership — not just genre
+- From authors at a comparable or slightly higher career level — not Pulitzer winners for a debut unless there's a very specific reason
+- Specific enough to signal taste, broad enough to suggest an audience
+
+Never use the word "actually." Output ONLY valid JSON, no markdown, no preamble:
+{
+  "comps": [
+    {
+      "name": "Author Name — Book Title (Year)",
+      "reason": "One sentence on why this is a good comp — specific, not vague.",
+      "defend": "2-3 sentences the author can use to explain this comp in a query letter or conversation with an agent. What specifically connects the two books."
+    }
+  ],
+  "pitch_line": "A single 'for readers of X and Y' pitch line using the two strongest comps. Reads naturally, not like a formula.",
+  "pitch_alt": "An alternative pitch line using different comps or a different framing.",
+  "avoid": [
+    {
+      "name": "Author or Book to avoid",
+      "reason": "Why this is a bad comp — be specific. Include whether it's too old, too big, wrong career level, or just a mismatch."
+    }
+  ]
+}`;
+
+  const user = `Author: ${authorName || 'the author'}
+Book title: ${bookTitle}
+Genre: ${genre || 'not specified'}
+Stage: ${stage || 'not specified'}
+What it's really about: ${hook}
+${influences ? `Books/authors that influenced them or they love: ${influences}` : ''}
+${diff ? `What makes their book different from their influences: ${diff}` : ''}
+${reader ? `Ideal reader: ${reader}` : ''}
+
+Find 4-5 appropriate comp authors with full reasoning, two pitch lines, and 3-4 specific comps to avoid with explanations. For the avoid list, make sure to flag any blockbusters, books over 5 years old, and authors at a significantly different career level.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system,
+        messages: [{ role: 'user', content: user }]
+      })
+    });
+
+    const data = await res.json();
+    clearInterval(loadingInterval);
+    const raw = (data.content?.find(b => b.type==='text')?.text||'');
+    const s = raw.indexOf('{'); const e = raw.lastIndexOf('}');
+    if (s === -1 || e === -1) throw new Error('No JSON found in response');
+    const p = JSON.parse(raw.slice(s, e + 1));
+    generatedData = p;
+
+    document.getElementById('results-badge').textContent = bookTitle;
+
+    // Render comps
+    const compsList = document.getElementById('comps-list');
+    compsList.innerHTML = '';
+    (p.comps || []).forEach(comp => {
+      const div = document.createElement('div');
+      div.className = 'comp-card';
+      div.innerHTML = `<div class="comp-name">${comp.name}</div><div class="comp-reason">${comp.reason}</div><div class="comp-why">${comp.defend}</div>`;
+      compsList.appendChild(div);
+    });
+
+    document.getElementById('pitch-line').textContent = p.pitch_line;
+    document.getElementById('pitch-alt').textContent = p.pitch_alt;
+
+    // Render avoid list
+    const avoidList = document.getElementById('avoid-list');
+    avoidList.innerHTML = '';
+    (p.avoid || []).forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'avoid-card';
+      div.innerHTML = `<div class="avoid-name">${item.name}</div><div class="avoid-reason">${item.reason}</div>`;
+      avoidList.appendChild(div);
+    });
+
+    hide('loading-box'); show('results');
+
+  } catch(err) {
+    clearInterval(loadingInterval);
+    hide('loading-box');
+    document.getElementById('error-text').textContent = 'Something went sideways: ' + err.message;
+    show('error-box');
+    document.getElementById('input-card').style.display = 'block';
+  }
+}
+
+function copyComps() {
+  if (!generatedData?.comps) return;
+  const text = generatedData.comps.map(c => `${c.name}\n${c.reason}\n${c.defend}`).join('\n\n');
+  navigator.clipboard.writeText(text).catch(()=>{});
+}
+
+function copyId(id) {
+  const el = document.getElementById(id);
+  if (el) navigator.clipboard.writeText(el.textContent).catch(()=>{});
+}
+
+function reset() {
+  hide('results'); hide('error-box');
+  generatedData = null;
+  document.getElementById('input-card').style.display = 'block';
+}
+</script>
+</body>
+</html>

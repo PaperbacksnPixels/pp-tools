@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Substack Strategy Builder — Paperbacks & Pixels</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Literata:ital,wght@0,400;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#E0E0DC; --bg-card:#ECEAE2; --bg-light:#F5F3EC;
+  --border:#1A1A1A; --text:#1A1A1A; --muted:#6A6A62;
+  --gold:#B8A050; --gold-hover:#C8B060; --gold-bg:#E8E2CC;
+  --shadow:4px 4px 0px #1A1A1A; --shadow-lg:6px 6px 0px #1A1A1A;
+}
+body {
+  background:var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px),
+    repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.006) 3px,rgba(0,0,0,.006) 4px);
+  font-family:'Literata',serif; color:var(--text); min-height:100vh; padding:32px 20px 64px;
+}
+.header { text-align:center; margin-bottom:32px; }
+.wordmark { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.title { font-family:'Outfit',sans-serif; font-size:2rem; font-weight:900; text-transform:uppercase; letter-spacing:-1px; line-height:1; }
+.subtitle { font-size:.9rem; color:var(--muted); margin-top:8px; font-style:italic; }
+
+.card { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow); padding:28px; max-width:660px; margin:0 auto 20px; }
+.field { margin-bottom:20px; }
+label { font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:7px; }
+.label-note { font-family:'Literata',serif; font-size:.75rem; color:var(--muted); font-weight:400; font-style:italic; margin-left:5px; text-transform:none; letter-spacing:0; }
+textarea, input[type=text] {
+  width:100%; border:3px solid var(--border); background:var(--bg-light);
+  font-family:'Literata',serif; font-size:.95rem; padding:12px 14px;
+  color:var(--text); outline:none; border-radius:0; display:block;
+}
+textarea { resize:vertical; min-height:82px; }
+textarea:focus, input[type=text]:focus { background:#fff; }
+.field-row { display:flex; gap:12px; }
+.field-row .field { flex:1; min-width:0; }
+
+.seg-row { display:flex; gap:0; flex-wrap:wrap; margin-top:2px; }
+.seg-btn {
+  border:3px solid var(--border); padding:10px 16px; cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.5px; background:var(--bg-light);
+  margin-right:-3px; margin-bottom:-3px; transition:background .1s; color:var(--text);
+}
+.seg-btn:hover { background:var(--gold-bg); }
+.seg-btn.selected { background:var(--gold); }
+
+.launch-btn {
+  display:block; width:100%; margin-top:24px;
+  background:var(--gold); border:3px solid var(--border); box-shadow:var(--shadow);
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem;
+  text-transform:uppercase; letter-spacing:.5px; padding:17px;
+  cursor:pointer; transition:all .1s; color:var(--text);
+}
+.launch-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-lg); background:var(--gold-hover); }
+.launch-btn:active { transform:translate(2px,2px); box-shadow:0 0 0 var(--border); }
+
+.loading-box {
+  border:3px solid var(--border); background:var(--gold-bg); padding:30px;
+  text-align:center; box-shadow:var(--shadow); max-width:660px; margin:0 auto 20px; display:none;
+}
+.loading-text { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.05rem; text-transform:uppercase; letter-spacing:.5px; }
+.loading-sub { font-size:.85rem; color:var(--muted); margin-top:6px; font-style:italic; }
+.dot-anim::after { content:''; animation:dots 1.2s steps(4,end) infinite; }
+@keyframes dots { 0%,100%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+.error-box { border:3px solid var(--border); background:#F5E8E8; padding:18px 22px; display:none; max-width:660px; margin:0 auto 16px; }
+.error-text { font-family:'Outfit',sans-serif; font-weight:700; font-size:.88rem; }
+
+.results { max-width:660px; margin:0 auto; display:none; }
+.results-header {
+  display:flex; align-items:center; justify-content:space-between;
+  border:3px solid var(--border); border-bottom:none; background:var(--gold-bg); padding:11px 16px;
+}
+.results-title { font-family:'Outfit',sans-serif; font-weight:900; font-size:.85rem; text-transform:uppercase; letter-spacing:.3px; }
+.results-badge { font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:3px 10px; border:2px solid var(--border); background:var(--bg-light); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.tab-row { display:flex; border:3px solid var(--border); border-bottom:none; border-top:2px solid var(--border); }
+.tab { flex:1; padding:9px 4px; font-family:'Outfit',sans-serif; font-size:.6rem; font-weight:800; text-transform:uppercase; letter-spacing:.3px; cursor:pointer; background:var(--bg); border-right:2px solid var(--border); text-align:center; transition:background .1s; }
+.tab:last-child { border-right:none; }
+.tab.active { background:var(--gold); }
+.tab:hover:not(.active) { background:var(--gold-bg); }
+.tab-content { background:var(--bg-card); border:3px solid var(--border); box-shadow:var(--shadow-lg); padding:24px; display:none; }
+.tab-content.active { display:block; }
+
+.section-label { font-family:'Space Mono',monospace; font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:10px; }
+.copy-text { font-family:'Literata',serif; font-size:.93rem; line-height:1.68; color:var(--text); white-space:pre-wrap; word-break:break-word; }
+.divider { border:none; border-top:2px solid var(--border); margin:20px 0; }
+
+.pillar-card {
+  border:3px solid var(--border); padding:16px 18px; margin-bottom:12px;
+  background:var(--bg-light); box-shadow:2px 2px 0 var(--border);
+}
+.pillar-name { font-family:'Outfit',sans-serif; font-weight:900; font-size:.95rem; margin-bottom:4px; }
+.pillar-desc { font-family:'Literata',serif; font-size:.88rem; color:var(--muted); line-height:1.55; margin-bottom:8px; }
+.pillar-examples { font-family:'Literata',serif; font-size:.85rem; color:var(--text); line-height:1.6; }
+
+.cadence-row {
+  display:flex; gap:12px; margin-bottom:12px; align-items:flex-start;
+}
+.cadence-label {
+  font-family:'Outfit',sans-serif; font-weight:900; font-size:.7rem;
+  text-transform:uppercase; letter-spacing:.5px; background:var(--gold);
+  border:2px solid var(--border); padding:4px 10px; white-space:nowrap; margin-top:2px;
+}
+.cadence-text { font-family:'Literata',serif; font-size:.9rem; line-height:1.6; color:var(--text); }
+
+.copy-btn { margin-top:12px; border:2px solid var(--border); background:transparent; font-family:'Outfit',sans-serif; font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:6px 14px; cursor:pointer; transition:all .1s; }
+.copy-btn:hover { background:var(--text); color:var(--bg-light); }
+.reset-btn { display:block; margin:18px auto 0; border:2px solid var(--border); background:transparent; font-family:'Outfit',sans-serif; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; padding:8px 20px; cursor:pointer; transition:all .1s; }
+.reset-btn:hover { background:var(--text); color:var(--bg-light); }
+
+.email-num { font-family:'Outfit',sans-serif; font-size:.68rem; font-weight:900; text-transform:uppercase; letter-spacing:1px; background:var(--gold); display:inline-block; padding:3px 10px; border:2px solid var(--border); margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="wordmark">Paperbacks & Pixels</div>
+  <div class="title">Substack Strategy Builder</div>
+  <div class="subtitle">Tell us about your writing and where you're starting. Get a strategy you can actually follow.</div>
+</div>
+
+<div class="card" id="input-card">
+
+  <div class="field-row">
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="author-name" placeholder="e.g. Marguerite Flynn">
+    </div>
+    <div class="field">
+      <label>Your Substack Name <span class="label-note">or working title</span></label>
+      <input type="text" id="substack-name" placeholder="e.g. The Unlit Hours, or just 'not sure yet'">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Where are you starting from?</label>
+    <div class="seg-row" id="seg-stage">
+      <button class="seg-btn selected" data-val="scratch">Starting from scratch</button>
+      <button class="seg-btn" data-val="migrating">Migrating from another platform</button>
+      <button class="seg-btn" data-val="existing">Already on Substack, want a better strategy</button>
+    </div>
+  </div>
+
+  <div class="field" id="field-migration" style="display:none;">
+    <label>Where are you migrating from? <span class="label-note">and roughly how many subscribers</span></label>
+    <input type="text" id="migration-from" placeholder="e.g. Mailchimp, 800 subscribers — or Instagram, no email list yet">
+  </div>
+
+  <div class="field">
+    <label>What do you write? <span class="label-note">books, genre, themes — give us the real picture</span></label>
+    <textarea id="author-writing" placeholder="e.g. I write upmarket literary fiction about diaspora and memory. My debut comes out in 2026. I also think a lot about the publishing industry and what it gets wrong about certain kinds of books."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Who is your ideal subscriber? <span class="label-note">not just 'readers' — be specific</span></label>
+    <input type="text" id="ideal-subscriber" placeholder="e.g. Readers who care about craft, writers working on their first novel, people interested in what publishing actually looks like from the inside...">
+  </div>
+
+  <div class="field">
+    <label>What do you want Substack to do for you? <span class="label-note">be honest</span></label>
+    <div class="seg-row" id="seg-goal">
+      <button class="seg-btn selected" data-val="build audience before book launch">Build audience before a book launch</button>
+      <button class="seg-btn" data-val="generate income">Generate income</button>
+      <button class="seg-btn" data-val="build a writing practice">Build a writing practice in public</button>
+      <button class="seg-btn" data-val="connect with readers">Connect with existing readers</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>How much time can you realistically give this? <span class="label-note">be honest</span></label>
+    <div class="seg-row" id="seg-time">
+      <button class="seg-btn selected" data-val="1-2 hours a week">1-2 hrs/week</button>
+      <button class="seg-btn" data-val="3-5 hours a week">3-5 hrs/week</button>
+      <button class="seg-btn" data-val="more than 5 hours a week">5+ hrs/week</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Your voice / vibe <span class="label-note">optional — paste from Find Your Voice if you have it</span></label>
+    <input type="text" id="author-voice" placeholder="e.g. quiet but precise, a little melancholy, warm underneath — or paste your voice one-liner here">
+  </div>
+
+  <button class="launch-btn" onclick="launch()">Build My Strategy →</button>
+</div>
+
+<div class="loading-box" id="loading-box">
+  <div class="loading-text">Building your strategy<span class="dot-anim"></span></div>
+  <div class="loading-sub" id="loading-sub">Thinking about what actually works.</div>
+</div>
+
+<div class="error-box" id="error-box">
+  <div class="error-text" id="error-text">Something went sideways. Try again.</div>
+</div>
+
+<div class="results" id="results">
+  <div class="results-header">
+    <span class="results-title">Your Substack Strategy</span>
+    <span class="results-badge" id="results-badge">—</span>
+  </div>
+  <div class="tab-row">
+    <div class="tab active" onclick="showTab('pillars')">Pillars</div>
+    <div class="tab" onclick="showTab('cadence')">Cadence</div>
+    <div class="tab" onclick="showTab('growth')">Growth</div>
+    <div class="tab" onclick="showTab('money')">Monetization</div>
+    <div class="tab" onclick="showTab('welcome')">Welcome Email</div>
+  </div>
+
+  <!-- PILLARS -->
+  <div class="tab-content active" id="tab-pillars">
+    <div class="section-label" style="margin-bottom:14px;">Your content pillars — the recurring types of posts that give your Substack shape</div>
+    <div id="pillars-list"></div>
+    <button class="copy-btn" onclick="copyPillars()">Copy all pillars</button>
+  </div>
+
+  <!-- CADENCE -->
+  <div class="tab-content" id="tab-cadence">
+    <div class="section-label" style="margin-bottom:14px;">A publishing schedule based on your available time</div>
+    <div id="cadence-content"></div>
+    <button class="copy-btn" onclick="copyId('cadence-content')">Copy cadence plan</button>
+  </div>
+
+  <!-- GROWTH -->
+  <div class="tab-content" id="tab-growth">
+    <div class="section-label" style="margin-bottom:14px;">How to build subscribers — specific to where you're starting</div>
+    <div class="copy-text" id="growth-content"></div>
+    <button class="copy-btn" onclick="copyId('growth-content')">Copy growth strategy</button>
+  </div>
+
+  <!-- MONETIZATION -->
+  <div class="tab-content" id="tab-money">
+    <div class="section-label" style="margin-bottom:6px;">Free vs paid — what goes where</div>
+    <div class="copy-text" id="money-content"></div>
+    <button class="copy-btn" onclick="copyId('money-content')">Copy monetization strategy</button>
+  </div>
+
+  <!-- WELCOME EMAIL -->
+  <div class="tab-content" id="tab-welcome">
+    <div class="email-num">Welcome Email</div>
+    <div class="section-label">Subject</div>
+    <div class="copy-text" id="welcome-subject" style="font-weight:600;margin-bottom:10px;"></div>
+    <div class="copy-text" id="welcome-body"></div>
+    <button class="copy-btn" onclick="copyWelcome()">Copy welcome email</button>
+  </div>
+
+  <button class="reset-btn" onclick="reset()">← Start Over</button>
+</div>
+
+<script>
+let generatedData = null;
+let currentStage = 'scratch';
+let currentGoal = 'build audience before book launch';
+let currentTime = '1-2 hours a week';
+
+const loadingLines = [
+  'Thinking about what actually works.',
+  'Matching strategy to your time.',
+  'Figuring out what goes behind the wall.',
+  'Writing the welcome email.',
+  'Building something sustainable.',
+  'Not recommending daily posting, don\'t worry.'
+];
+let loadingInterval;
+
+document.querySelectorAll('#seg-stage .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#seg-stage .seg-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentStage = btn.dataset.val;
+    document.getElementById('field-migration').style.display = currentStage === 'migrating' ? 'block' : 'none';
+  });
+});
+
+document.querySelectorAll('#seg-goal .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#seg-goal .seg-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentGoal = btn.dataset.val;
+  });
+});
+
+document.querySelectorAll('#seg-time .seg-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#seg-time .seg-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    currentTime = btn.dataset.val;
+  });
+});
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const map = { pillars:0, cadence:1, growth:2, money:3, welcome:4 };
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+async function launch() {
+  const writing = document.getElementById('author-writing').value.trim();
+  const subscriber = document.getElementById('ideal-subscriber').value.trim();
+  if (!writing || !subscriber) { alert('Fill in what you write and who your ideal subscriber is.'); return; }
+
+  const authorName = document.getElementById('author-name').value.trim();
+  const substackName = document.getElementById('substack-name').value.trim();
+  const migrationFrom = document.getElementById('migration-from').value.trim();
+  const voice = document.getElementById('author-voice').value.trim();
+
+  hide('results'); hide('error-box');
+  document.getElementById('input-card').style.display = 'none';
+
+  let li = 0;
+  document.getElementById('loading-sub').textContent = loadingLines[0];
+  show('loading-box');
+  loadingInterval = setInterval(() => {
+    li = (li + 1) % loadingLines.length;
+    document.getElementById('loading-sub').textContent = loadingLines[li];
+  }, 2000);
+
+  const system = `You are a publishing strategist who specialises in helping authors build Substack newsletters that support their writing careers. You give honest, practical advice — not hype. You know that most authors cannot post daily and you never recommend it. You know the difference between what grows a Substack and what burns out the writer. You understand that an author's newsletter serves their writing career, not the other way around.
+
+Rules: Never use the word "actually." Never treat social media platforms or algorithms as people with intentions. Never recommend strategies that require more time than the author says they have. Be specific — generic advice like "be consistent" is useless without telling them what consistent looks like for their situation.
+
+Output ONLY valid JSON, no markdown, no preamble:
+{
+  "pillars": [
+    {
+      "name": "Short pillar name",
+      "description": "What this pillar is and why it fits this author. 2-3 sentences.",
+      "examples": "2-3 specific post ideas within this pillar, written as actual post titles or prompts."
+    }
+  ],
+  "cadence": {
+    "recommendation": "Specific posting frequency recommendation with reasoning. Not just 'once a week' — say which day, why, and what type of post goes when.",
+    "schedule": "A concrete weekly or monthly schedule they can copy. Formatted as a simple plan e.g. 'Every Tuesday: [type of post]. First Thursday of the month: [type of post].'",
+    "reality_check": "One honest sentence about what to do when life gets in the way."
+  },
+  "growth": "5-6 specific, actionable growth strategies tailored to where this author is starting from. Not generic tips — specific to their situation, their writing, and their goal. Each strategy on its own line starting with —",
+  "monetization": "4-5 sentences on the free vs paid split. What specifically should be free (and why), what should go behind the paywall (and why), when to turn on paid, and what price point makes sense for this type of author newsletter. Be honest about when it's too early to monetize.",
+  "welcome_subject": "Welcome email subject line. Warm, specific, not generic.",
+  "welcome_body": "150-200 word welcome email in the author's voice. Sets expectations, makes the subscriber feel like they made a good decision, hints at what's coming. First person. No 'I'm so excited you're here.'"
+}`;
+
+  const user = `Author: ${authorName || 'the author'}
+Substack name: ${substackName || 'not decided yet'}
+Starting point: ${currentStage}${migrationFrom ? ` — migrating from: ${migrationFrom}` : ''}
+What they write: ${writing}
+Ideal subscriber: ${subscriber}
+Primary goal: ${currentGoal}
+Available time: ${currentTime}
+${voice ? `Voice/vibe: ${voice}` : ''}
+
+Build a complete, honest Substack strategy for this author.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system,
+        messages: [{ role: 'user', content: user }]
+      })
+    });
+
+    const data = await res.json();
+    clearInterval(loadingInterval);
+    const raw = (data.content?.find(b => b.type==='text')?.text||'');
+    const s = raw.indexOf('{'); const e = raw.lastIndexOf('}');
+    if (s === -1 || e === -1) throw new Error('No JSON found in response');
+    const p = JSON.parse(raw.slice(s, e + 1));
+    generatedData = p;
+
+    document.getElementById('results-badge').textContent = substackName || authorName || 'Your strategy';
+
+    // Pillars
+    const pillarsList = document.getElementById('pillars-list');
+    pillarsList.innerHTML = '';
+    (p.pillars || []).forEach(pillar => {
+      const div = document.createElement('div');
+      div.className = 'pillar-card';
+      div.innerHTML = `<div class="pillar-name">${pillar.name}</div><div class="pillar-desc">${pillar.description}</div><div class="pillar-examples">${pillar.examples}</div>`;
+      pillarsList.appendChild(div);
+    });
+
+    // Cadence
+    const cadenceEl = document.getElementById('cadence-content');
+    cadenceEl.innerHTML = '';
+    if (p.cadence) {
+      const rows = [
+        { label: 'Recommendation', text: p.cadence.recommendation },
+        { label: 'Schedule', text: p.cadence.schedule },
+        { label: 'Reality check', text: p.cadence.reality_check }
+      ];
+      rows.forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'cadence-row';
+        div.innerHTML = `<div class="cadence-label">${row.label}</div><div class="cadence-text">${row.text}</div>`;
+        cadenceEl.appendChild(div);
+      });
+    }
+
+    document.getElementById('growth-content').textContent = p.growth;
+    document.getElementById('money-content').textContent = p.monetization;
+    document.getElementById('welcome-subject').textContent = 'Subject: ' + p.welcome_subject;
+    document.getElementById('welcome-body').textContent = p.welcome_body;
+
+    hide('loading-box'); show('results');
+
+  } catch(err) {
+    clearInterval(loadingInterval);
+    hide('loading-box');
+    document.getElementById('error-text').textContent = 'Something went sideways: ' + err.message;
+    show('error-box');
+    document.getElementById('input-card').style.display = 'block';
+  }
+}
+
+function copyPillars() {
+  if (!generatedData?.pillars) return;
+  const text = generatedData.pillars.map(p => `${p.name}\n${p.description}\n${p.examples}`).join('\n\n');
+  navigator.clipboard.writeText(text).catch(()=>{});
+}
+
+function copyId(id) {
+  const el = document.getElementById(id);
+  if (el) navigator.clipboard.writeText(el.textContent).catch(()=>{});
+}
+
+function copyWelcome() {
+  if (!generatedData) return;
+  navigator.clipboard.writeText(`Subject: ${generatedData.welcome_subject}\n\n${generatedData.welcome_body}`).catch(()=>{});
+}
+
+function reset() {
+  hide('results'); hide('error-box');
+  generatedData = null;
+  document.getElementById('input-card').style.display = 'block';
+}
+</script>
+</body>
+</html>
