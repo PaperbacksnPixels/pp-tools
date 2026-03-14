@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# Stripe webhook needs raw body — disable body parsing
+[functions."stripe-webhook"]
+  included_files = []
